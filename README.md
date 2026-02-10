@@ -1,4 +1,4 @@
-# Assignment 1 - LiftBase
+# LiftBase
 
 ## Author
 
