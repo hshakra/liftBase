@@ -248,7 +248,8 @@ function showExerciseModal(exercise) {
   const resultsContainer = document.getElementById("results-container");
   if (!resultsContainer) return;
   resultsContainer.addEventListener("click", function (e) {
-    const btn = e.target && e.target.closest && e.target.closest(".add-to-workout-btn");
+    const btn =
+      e.target && e.target.closest && e.target.closest(".add-to-workout-btn");
     if (!btn) return;
     e.preventDefault();
     const id = parseInt(btn.getAttribute("data-exercise-id"), 10);
