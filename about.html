@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>About - LiftBase</title>
+    <!-- Bootstrap 5.3.0: https://getbootstrap.com/ -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="css/styles.css" />
+  </head>
+  <body>
+    <header>
+      <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="index.html">LiftBase</a>
+          <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNav"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+              <li class="nav-item">
+                <a class="nav-link" href="index.html">Home</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="favourites.html">Favourites</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link active" href="about.html">About</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <main>
+      <section class="container my-5">
+        <h1 class="mb-4">About LiftBase</h1>
+
+        <p>
+          LiftBase is a small exercise database app that lets you browse
+          exercises by muscle group. Pick a muscle (e.g. Chest, Biceps, Core),
+          hit Search, and you get a set of exercises with category, equipment,
+          and muscles listed. You can open full details in a modal or add
+          exercises to your Favourites to find them later.
+        </p>
+
+        <p>
+          Use the Home page to search. Each result card has a "Learn More"
+          button for the full description and an "Add to Favourites" button to
+          save it. Favourites are stored in your browser and stay there until
+          you remove them. The Favourites page shows everything you saved and
+          lets you remove items one by one.
+        </p>
+
+        <p>
+          Exercise data comes from the WGER Workout Manager API. No account or
+          API key is required to use LiftBase.
+        </p>
+      </section>
+    </main>
+
+    <footer class="bg-dark text-white text-center py-4 mt-5">
+      <div class="container">
+        <p>&copy; 2024 LiftBase - Exercise Database</p>
+        <p class="small">Powered by WGER Workout Manager API</p>
+      </div>
+    </footer>
+
+    <!-- Bootstrap 5.3.0: https://getbootstrap.com/ -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>
