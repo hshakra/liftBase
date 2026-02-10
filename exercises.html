@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Your saved LiftBase exercises. View and remove favourites stored in your browser." />
-    <title>Favourites - LiftBase</title>
+    <meta name="description" content="Browse exercises by muscle group. Filter by equipment, search by name, add to workout or favourites." />
+    <title>Exercises - LiftBase</title>
     <!-- Bootstrap 5.3.0: https://getbootstrap.com/ -->
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
@@ -31,13 +31,13 @@
                 <a class="nav-link" href="index.html">Home</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="exercises.html">Exercises</a>
+                <a class="nav-link active" href="exercises.html">Exercises</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="workouts.html">My Workouts</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link active" href="favourites.html">Favourites</a>
+                <a class="nav-link" href="favourites.html">Favourites</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="about.html">About</a>
@@ -52,13 +52,74 @@
     </header>
 
     <main>
-      <section class="container my-5">
-        <h1 class="mb-4">Favourites</h1>
+      <section class="hero-section hero-section-compact">
+        <div class="container text-center py-4">
+          <h1 class="hero-title mb-2">LiftBase</h1>
+          <p class="hero-tagline mb-0">Your exercise database by muscle group</p>
+        </div>
+      </section>
 
-        <div id="favourites-container" class="row">
-          <p class="text-center">No favourites yet.</p>
+      <section id="browse-section" class="container my-5">
+        <h2 class="text-center mb-4">Find Your Next Exercise</h2>
+
+        <div class="search-area">
+          <form>
+            <label for="muscle-groups-menu">Choose a muscle group:</label>
+            <select id="muscle-groups-menu" class="form-select form-select-sm">
+              <option selected value="4">Chest</option>
+              <option value="12">Lats</option>
+              <option value="9">Traps</option>
+              <option value="2">Shoulders</option>
+              <option value="1">Biceps</option>
+              <option value="5">Triceps</option>
+              <option value="8">Glutes</option>
+              <option value="10">Quadriceps</option>
+              <option value="11">Hamstrings</option>
+              <option value="7">Calves</option>
+              <option value="6">Core / Abs</option>
+            </select>
+            <button
+              class="btn btn-primary mt-3"
+              id="muscle-menu-submit"
+              type="submit"
+            >
+              Search
+            </button>
+          </form>
         </div>
 
+        <div id="filter-panel" class="mt-4" style="display: none;">
+          <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center py-2">
+              <button class="btn btn-link btn-sm text-decoration-none p-0" type="button" data-bs-toggle="collapse" data-bs-target="#filter-collapse" aria-expanded="false" aria-controls="filter-collapse">
+                Filters
+              </button>
+              <span id="filter-indicator" style="display: none;">
+                <span id="filtered-count">0</span> exercises
+                <span id="filter-active-badge" class="badge bg-primary ms-1" style="display: none;"></span>
+                <button type="button" class="btn btn-sm btn-outline-secondary ms-2" id="filter-clear-btn">Clear filters</button>
+              </span>
+            </div>
+            <div class="collapse" id="filter-collapse">
+              <div class="card-body pt-0">
+                <label for="filter-search" class="form-label small">Search by name</label>
+                <input type="text" id="filter-search" class="form-control form-control-sm mb-2" placeholder="Type to filter..." />
+                <label class="form-label small">Equipment</label>
+                <div id="filter-equipment-list" class="d-flex flex-wrap gap-3"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="container my-5">
+        <h3 class="mb-4">Results</h3>
+
+        <div id="results-container" class="row">
+          <p class="text-center">Results will appear here ...</p>
+        </div>
+
+        <!-- Modal -->
         <div
           class="modal fade"
           id="exampleModal"
@@ -75,6 +136,7 @@
       </section>
     </main>
 
+    <!-- Workout builder offcanvas -->
     <div class="offcanvas offcanvas-end" tabindex="-1" id="workout-offcanvas" aria-labelledby="workout-offcanvas-label">
       <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="workout-offcanvas-label">Workout</h5>
@@ -82,7 +144,7 @@
       </div>
       <div class="offcanvas-body">
         <div id="workout-sidebar-empty" class="text-center text-muted small py-3">
-          No exercises yet. Add exercises from the Home page to build your workout.
+          No exercises yet. Add exercises from the results to build your workout.
         </div>
         <div id="workout-sidebar-list-wrap" style="display: none;">
           <div id="workout-summary" class="mb-2"></div>
@@ -106,6 +168,8 @@
       </div>
     </div>
 
+    <div id="workout-print-content" class="d-none"></div>
+
     <footer class="bg-dark text-white text-center py-4 mt-5">
       <div class="container">
         <p>&copy; 2025 LiftBase - Exercise Database</p>
@@ -118,8 +182,15 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/favourites-storage.js"></script>
     <script src="js/workout-storage.js"></script>
+    <script src="js/filters.js"></script>
     <script src="js/muscle-coverage.js"></script>
     <script src="js/workout-builder.js"></script>
-    <script src="js/favourites.js"></script>
+    <script src="js/script.js"></script>
+    <script>
+      var filterClearBtn = document.getElementById("filter-clear-btn");
+      if (filterClearBtn && typeof clearFilters === "function") {
+        filterClearBtn.addEventListener("click", clearFilters);
+      }
+    </script>
   </body>
 </html>

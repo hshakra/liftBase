@@ -3,10 +3,6 @@
 ## Author
 
 - **Name:** Husam Abo Shakra
-- **B00/B01:** B00980313
-- **Email:** hs407359@dal.ca
-
-**Project:** https://git.cs.dal.ca/courses/2026-winter/csci-2170/assignments/a1/hshakra
 
 ---
 
@@ -21,13 +17,15 @@
 ## Setup and Run
 
 1. Clone or download this project.
-2. Open `index.html` in a browser
-3. No build step or extra steps needed, Bootstrap is loaded from a CDN.
+2. Open `index.html` in a browser (landing page). Use "Get Started" or "Exercises" to open the exercise browser (`exercises.html`).
+3. No build step or extra steps needed; Bootstrap and Chart.js are loaded from CDNs.
 
 ---
 
 ## Features
 
+- **Landing page (index.html)** - Entry point with hero ("Build Smarter Workouts with LiftBase"), features overview, How it works (4 steps), About (WGER API), and footer links. "Get Started" and "Browse Exercises" go to the Exercises page.
+- **Exercises page (exercises.html)** - Main app: muscle group search, filters, results, workout offcanvas. Nav: Home (landing), Exercises (active), My Workouts, Favourites, About, Workout.
 - **Muscle group search** - Dropdown to choose a muscle group (Chest, Lats, Shoulders, Biceps, Triceps, Glutes, Quadriceps, Hamstrings, Calves, Core/Abs, Traps) and a Search button.
 - **Exercise result cards** - After searching, exercises are shown as cards with name, category, equipment, muscles, and a short description preview.
 - **Learn More modal** - Each card has a "Learn More" button that opens a Bootstrap modal with full exercise details (category, equipment, muscles, full description). The same modal works on the Home results and on the Favourites page.
@@ -36,6 +34,13 @@
 - **About page** - Short explanation of what LiftBase is and how to use it. Linked from the navbar.
 - **Responsive layout** - Bootstrap 5 for layout and components; navbar collapses on small screens; cards stack on narrow viewports.
 - **Light styling** - Custom CSS for search area and a slight hover effect on result cards.
+
+**Enhanced features:**
+
+- **Filtering** - After searching by muscle group, a collapsible filter panel appears. Search by exercise name (real-time, debounced) and filter by equipment (checkboxes). Clear filters button and active filter count.
+- **Workout builder** - "Add to Workout" on each exercise card (Exercises and Favourites). Workout panel (offcanvas) shows current workout with sets and notes per exercise, reorder (up/down), remove, and summary. Save workout (prompt for name, stored in localStorage), Clear (with confirmation), Export: copy to clipboard or print (new window).
+- **My Workouts** - Page listing all saved workouts. View (modal with exercise list and muscle coverage chart), Load (into builder), Delete.
+- **Muscle coverage charts** - Chart.js bar chart in the workout builder sidebar (exercises per muscle group) and on the My Workouts detail modal. Balance indicator suggests adding upper/lower variety when the workout is one-sided.
 
 ---
 
@@ -52,7 +57,7 @@ API: WGER Workout Manager. Base URL: https://wger.de/ No API key required.
 
 - English exercises use `language=2` in the exerciseinfo request.
 - If the API is slow or unavailable, the results area may stay on "Loading..." or show no results; check the browser console for errors.
-- Favourites are stored in the browser only (localStorage). Clearing site data or using a different browser/device will not show your saved favourites.
+- Favourites and workouts are stored in the browser only (localStorage). Clearing site data or using a different browser/device will not show your saved data.
 
 ---
 
@@ -61,6 +66,8 @@ API: WGER Workout Manager. Base URL: https://wger.de/ No API key required.
 **External Libraries:**
 
 Bootstrap. (n.d.). _Bootstrap 5.3 documentation_. Retrieved February 9, 2025, from https://getbootstrap.com/
+
+Chart.js. (n.d.). _Chart.js documentation_. Retrieved February 9, 2025, from https://www.chartjs.org/
 
 **APIs:**
 

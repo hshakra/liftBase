@@ -1,15 +1,19 @@
 // WGER Workout Manager API: https://wger.de/en/software/api
 // Bootstrap Modal component: https://getbootstrap.com/docs/5.3/components/modal/
 
-// result set for modal lookups
+// result set for modal lookups and for workout builder
 let currentExercises = [];
+window.currentExercisesForWorkout = currentExercises;
 
-// search by muscle on submit
+// search by muscle on submit (only on exercises page)
 const muscleGroupsMenu = document.getElementById("muscle-groups-menu");
-document.getElementById("muscle-menu-submit").addEventListener("click", (e) => {
-  e.preventDefault();
-  displayExercises(muscleGroupsMenu.value);
-});
+const muscleMenuSubmit = document.getElementById("muscle-menu-submit");
+if (muscleMenuSubmit && muscleGroupsMenu) {
+  muscleMenuSubmit.addEventListener("click", (e) => {
+    e.preventDefault();
+    displayExercises(muscleGroupsMenu.value);
+  });
+}
 
 // fetch muscle name - kept for debugging future muscle name display
 async function getMuscleName(id) {
@@ -45,29 +49,30 @@ async function getExercisesByMuscle(muscleId) {
   }
 }
 
-// render result cards
-async function displayExercises(id) {
+// render result cards from a list of exercises (full WGER objects)
+function renderResultCards(exercises) {
   const resultsContainer = document.getElementById("results-container");
-  // show loading message
-  resultsContainer.innerHTML =
-    '<p class="text-center">Loading exercises...</p>';
+  if (!resultsContainer) return;
 
-  const exercises = await getExercisesByMuscle(id);
-  currentExercises = exercises || [];
+  resultsContainer.classList.remove("loading-state");
+
+  if (!exercises || !exercises.length) {
+    resultsContainer.innerHTML =
+      '<p class="text-center">No exercises match the current filters.</p>';
+    return;
+  }
+
   resultsContainer.innerHTML = "";
 
-  exercises.forEach((exercise, i) => {
-    // getting all data
+  exercises.forEach((exercise) => {
     const engName = exercise.translations.find((t) => t.language === 2);
-    console.log(engName.name);
+    if (!engName) return;
 
     const name = engName.name;
     const category = exercise.category.name;
-    //handling possible description null or undefined
     const description =
       (engName.description || "").replace(/<[^>]*>/g, "").substring(0, 75) +
       "...";
-    //array of required equipment
     const eqNames = exercise.equipment.map((eq) => eq.name).join(", ");
     const muscleNames = exercise.muscles
       .map((m) => m.name_en || m.name)
@@ -80,7 +85,6 @@ async function displayExercises(id) {
       favLabel = "Add to Favourites";
     }
 
-    // render exercise card
     resultsContainer.innerHTML += `
     <div class="col-md-4 mb-3">
     <div class="card">
@@ -97,10 +101,11 @@ async function displayExercises(id) {
         ${description}
         </p>
         <div class="card-buttons">
-          <button class="btn btn-primary learn-more-btn" data-exercise-index="${i}">
+          <button class="btn btn-primary learn-more-btn" data-exercise-id="${exercise.id}">
             Learn More
           </button>
-          <button class="btn btn-outline-primary favourite-btn" data-exercise-index="${i}" data-exercise-id="${exercise.id}">${favLabel}</button>
+          <button class="btn btn-outline-primary favourite-btn" data-exercise-id="${exercise.id}">${favLabel}</button>
+          <button class="btn btn-outline-secondary btn-sm add-to-workout-btn" data-exercise-id="${exercise.id}">Add to Workout</button>
         </div>
       </div>
     </div>
@@ -109,14 +114,60 @@ async function displayExercises(id) {
 
   addLearnMoreListeners();
   addFavouriteListeners();
+  // Add to Workout is handled by event delegation on #results-container (see init)
 }
 
-// connect up learn more buttons
+// apply filters and re-render (uses filter state from filters.js)
+function applyFilters() {
+  const filtered = getFilteredExercises(currentExercises);
+  renderResultCards(filtered);
+  if (typeof updateFilterIndicator === "function") {
+    updateFilterIndicator(filtered.length, currentExercises.length);
+  }
+}
+
+// expose for filters.js
+window.applyFilters = applyFilters;
+
+// load exercises, then build filter UI and show results
+async function displayExercises(id) {
+  const resultsContainer = document.getElementById("results-container");
+  const filterPanel = document.getElementById("filter-panel");
+  if (resultsContainer) {
+    resultsContainer.classList.add("loading-state");
+    resultsContainer.innerHTML =
+      '<p class="text-center">Loading exercises...</p>';
+  }
+  if (filterPanel) filterPanel.style.display = "none";
+
+  const exercises = await getExercisesByMuscle(id);
+  currentExercises = exercises || [];
+  window.currentExercisesForWorkout = currentExercises;
+
+  if (!currentExercises.length) {
+    if (resultsContainer) {
+      resultsContainer.classList.remove("loading-state");
+      resultsContainer.innerHTML =
+        '<p class="text-center">No exercises found for this muscle group.</p>';
+    }
+    return;
+  }
+
+  const equipmentList = getEquipmentFromExercises(currentExercises);
+  if (filterPanel) {
+    filterPanel.style.display = "block";
+    renderFilterPanel(equipmentList);
+  }
+
+  applyFilters();
+}
+
+// connect up learn more buttons (by exercise id)
 function addLearnMoreListeners() {
   document.querySelectorAll(".learn-more-btn").forEach((btn) => {
     btn.addEventListener("click", (e) => {
-      const index = parseInt(e.currentTarget.dataset.exerciseIndex, 10);
-      const exercise = currentExercises[index];
+      const id = parseInt(e.currentTarget.dataset.exerciseId, 10);
+      const exercise = currentExercises.find((ex) => ex.id === id);
       if (exercise) showExerciseModal(exercise);
     });
   });
@@ -126,20 +177,15 @@ function addLearnMoreListeners() {
 function addFavouriteListeners() {
   document.querySelectorAll(".favourite-btn").forEach((btn) => {
     btn.addEventListener("click", (e) => {
-      // get exercise index and id from button data attribute
-      const index = parseInt(e.currentTarget.dataset.exerciseIndex, 10);
       const id = parseInt(e.currentTarget.dataset.exerciseId, 10);
-      const exercise = currentExercises[index];
-      // check if exercise is already in favourites
+      const exercise = currentExercises.find((ex) => ex.id === id);
       if (isFavourite(id)) {
         removeFavourite(id);
-        // update button text and class
         e.currentTarget.textContent = "Add to Favourites";
         e.currentTarget.classList.remove("btn-primary");
         e.currentTarget.classList.add("btn-outline-primary");
       } else if (exercise) {
         addFavourite(exercise);
-        // update button text and class
         e.currentTarget.textContent = "Remove from Favourites";
         e.currentTarget.classList.remove("btn-outline-primary");
         e.currentTarget.classList.add("btn-primary");
@@ -183,3 +229,32 @@ function showExerciseModal(exercise) {
   const modal = new bootstrap.Modal(modalEl);
   modal.show();
 }
+
+// search input: debounced filter (wire in HTML or here if filter-search exists)
+(function () {
+  const searchInput = document.getElementById("filter-search");
+  if (!searchInput) return;
+  searchInput.addEventListener(
+    "input",
+    window.debounce(function () {
+      setFilterSearchQuery(searchInput.value);
+      applyFilters();
+    }, 300),
+  );
+})();
+
+// event delegation for Add to Workout: single listener, no duplicate handlers
+(function () {
+  const resultsContainer = document.getElementById("results-container");
+  if (!resultsContainer) return;
+  resultsContainer.addEventListener("click", function (e) {
+    const btn = e.target && e.target.closest && e.target.closest(".add-to-workout-btn");
+    if (!btn) return;
+    e.preventDefault();
+    const id = parseInt(btn.getAttribute("data-exercise-id"), 10);
+    if (Number.isNaN(id)) return;
+    const exercises = window.currentExercisesForWorkout || [];
+    const exercise = exercises.find((ex) => ex && ex.id === id);
+    if (exercise && typeof addToWorkout === "function") addToWorkout(exercise);
+  });
+})();

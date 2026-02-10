@@ -46,6 +46,7 @@ function renderFavs() {
         <div class="card-buttons">
           <button class="btn btn-primary learn-more-btn" data-exercise-id="${exercise.id}">Learn More</button>
           <button class="btn btn-outline-primary remove-favourite-btn" data-exercise-id="${exercise.id}">Remove from Favourites</button>
+          <button class="btn btn-outline-secondary btn-sm add-to-workout-btn" data-exercise-id="${exercise.id}">Add to Workout</button>
         </div>
       </div>
     </div>
@@ -54,6 +55,19 @@ function renderFavs() {
 
   addLearnMoreListeners();
   addRemoveFavouriteListeners();
+  addFavouritesWorkoutListeners();
+}
+
+// wire Add to Workout on favourites page
+function addFavouritesWorkoutListeners() {
+  document.querySelectorAll(".add-to-workout-btn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      const id = parseInt(e.currentTarget.dataset.exerciseId, 10);
+      const exercise = getFavs().find((ex) => ex.id === id);
+      if (exercise && typeof addToWorkout === "function")
+        addToWorkout(exercise);
+    });
+  });
 }
 
 // connecting learn more button to modal
