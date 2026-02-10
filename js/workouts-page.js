@@ -15,13 +15,12 @@ function renderWorkoutsList() {
   }
 
   container.innerHTML = workouts
-    .map(
-      (w) => {
-        const count = (w.exercises || []).length;
-        const modified = w.lastModified
-          ? new Date(w.lastModified).toLocaleDateString()
-          : "";
-        return `
+    .map((w) => {
+      const count = (w.exercises || []).length;
+      const modified = w.lastModified
+        ? new Date(w.lastModified).toLocaleDateString()
+        : "";
+      return `
     <div class="card mb-3">
       <div class="card-body d-flex justify-content-between align-items-start flex-wrap gap-2">
         <div>
@@ -36,8 +35,7 @@ function renderWorkoutsList() {
       </div>
     </div>
     `;
-      },
-    )
+    })
     .join("");
 
   container.querySelectorAll(".view-workout-btn").forEach((btn) => {
@@ -93,7 +91,8 @@ function showWorkoutDetail(workoutId) {
   const coverage = getMuscleCoverage(w);
   const balance = getBalanceFeedback(coverage);
   if (balanceEl) {
-    balanceEl.className = "small " + (balance.ok ? "text-success" : "text-warning");
+    balanceEl.className =
+      "small " + (balance.ok ? "text-success" : "text-warning");
     balanceEl.textContent = balance.ok ? "Balanced coverage." : balance.message;
   }
 
@@ -119,7 +118,7 @@ function showWorkoutDetail(workoutId) {
       },
       options: {
         indexAxis: "y",
-        responsive: true,
+        responsive: false,
         maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: { x: { beginAtZero: true, ticks: { stepSize: 1 } } },
@@ -131,13 +130,17 @@ function showWorkoutDetail(workoutId) {
   if (loadBtn) {
     loadBtn.onclick = () => {
       loadWorkoutIntoCurrent(workoutId);
-      bootstrap.Modal.getInstance(document.getElementById("workout-detail-modal")).hide();
+      bootstrap.Modal.getInstance(
+        document.getElementById("workout-detail-modal"),
+      ).hide();
       const offcanvas = document.getElementById("workout-offcanvas");
       if (offcanvas) new bootstrap.Offcanvas(offcanvas).show();
     };
   }
 
-  const modal = new bootstrap.Modal(document.getElementById("workout-detail-modal"));
+  const modal = new bootstrap.Modal(
+    document.getElementById("workout-detail-modal"),
+  );
   modal.show();
 }
 
